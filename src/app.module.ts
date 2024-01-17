@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CoffeesModule } from './coffees/coffees.module';
@@ -6,7 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CoffeeRatingModule } from './coffee-rating/coffee-rating.module';
 import typeorm from './config/typeorm';
-import Joi from '@hapi/joi';
+import { APP_PIPE } from '@nestjs/core';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -14,10 +15,6 @@ import Joi from '@hapi/joi';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [typeorm],
-      validationSchema: Joi.object({
-        DATABASE_HOST: Joi.required(),
-        DATABASE_PORT: Joi.number().default(5432),
-      }),
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
@@ -25,6 +22,7 @@ import Joi from '@hapi/joi';
         configService.get('typeorm'),
     }),
     CoffeeRatingModule,
+    CommonModule,
   ],
   controllers: [AppController],
   providers: [AppService],
